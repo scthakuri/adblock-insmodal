@@ -22,16 +22,46 @@
   	<link rel="stylesheet" href="style.css">
 
     <script>
+        function getParameterByName(name, url = window.location.href) {
+            name = name.replace(/[\[\]]/g, '\\$&');
+            var regex = new RegExp('[?&]' + name + '(=([^&#]*)|&|#|$)'),
+                results = regex.exec(url);
+            if (!results) return null;
+            if (!results[2]) return '';
+            return decodeURIComponent(results[2].replace(/\+/g, ' '));
+        }
+
+        function hexToRgbA(hex, opacity = 1){
+            let c;
+            if(/^#([A-Fa-f0-9]{3}){1,2}$/.test(hex)){
+                c= hex.substring(1).split('');
+                if(c.length== 3){
+                    c= [c[0], c[0], c[1], c[1], c[2], c[2]];
+                }
+                c= '0x'+c.join('');
+                return 'rgba('+[(c>>16)&255, (c>>8)&255, c&255].join(',')+', '+opacity+')';
+            }
+            return hex;
+        }
+        
+        const backcolor = getParameterByName("b");
+        if( backcolor ){
+            const lightColor = hexToRgbA("#" + backcolor, 0.6);
+            document.documentElement.style.setProperty('--primary', '#' + backcolor);
+            document.documentElement.style.setProperty('--light', lightColor);
+        }
+
         // const parentBody = window.parent.document.body;
         $(document).ready(function () {
             
-            $(".hamburger").click(function () {
-                $(".wrapper").toggleClass("active")
+            $(".hamburger").click(function (e) {
+                e.preventDefault();
+                $(".wrapper").toggleClass("active");
             });
 
             $(document).on('click', '.reloadbtn', function (e) {
                 e.preventDefault();
-                window.parent.postMessage("adblockins", "*")
+                window.parent.postMessage("adblockins", "*");
             });
 
             $(document).on('click', '.reloadbtn_redirect', function (e) {
@@ -39,7 +69,8 @@
                 window.parent.postMessage("adblockinsredirect", "*")
             });
 
-            $(document).on('click', '.sidebar_ul_items li', function () {
+            $(document).on('click', '.sidebar_ul_items li', function (e) {
+                e.preventDefault();
                 const target = $(this).attr('data-id');
                 $(document).find('.sidebar_ul_items a').removeClass('active');
                 $(this).find('a').addClass('active');
