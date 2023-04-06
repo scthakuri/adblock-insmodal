@@ -258,7 +258,7 @@ body {
 }
 
 .content_item.active li:before{
-    content:"âž¤";
+    content:"➤";
     background: var(--primary);
     color: #fff;
     padding: 3px 5px;
